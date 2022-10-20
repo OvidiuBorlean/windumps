@@ -23,7 +23,7 @@ spec:
       - Expand-Archive c:\tmp\azcopy.zip -DestinationPath C:\tmp\;
       - c:\tmp\tcpdump -G 10 -W 1 -w c:\tmp/tcpdump.logs;
       - cd C:\tmp\azcopy*;
-      - ./azcopy.exe copy "C:\tmp\tcpdump.logs" "https://storageovidiuborlean.blob.core.windows.net/logs?sp=racwdli&st=2022-10-13T13:37:39Z&se=2025-10-13T21:37:39Z&spr=https&sv=2021-06-08&sr=c&sig=pRLKZgGVo77BVZa0Suki0CZo5fMReXi8VrXt1wnAH8A%3D"
+      - ./azcopy.exe copy "C:\tmp\tcpdump.logs" "$SAS-Key"
   volumes:
   - name: test-volume
     hostPath:

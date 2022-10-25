@@ -6,6 +6,7 @@ then
   echo "Invalid number of arguments"
   echo "Usage: kubectl windumps nodeName captureTime(s)"
   echo "kubectl-windumps.sh akswin0001 30"
+
 fi
 nodeName="$1"
 capTime="$2"
@@ -13,9 +14,9 @@ capTime="$2"
 #Checking for existence of SAS Key as environment variable in SAS
 if [[ -z "${SAS}" ]]; then
   echo "Storage Account Signature not found in environment variable. Please add the required value in SAS, eg. 'SAS=yourKey'"
-  #nodeName="$1"
-  #capTime="$2"
-  #SAS_key="$3"
+  nodeName="$1"
+  capTime="$2"
+  SAS_key="$3"
   exit
 else
 cat << EOF > ./windumps.yaml
@@ -45,8 +46,8 @@ spec:
       - Expand-Archive c:\tmp\azcopy.zip -DestinationPath C:\tmp\;
       - c:\tmp\tcpdump -G $2 -W 1 -w c:\tmp\\$nodeName.pcap;
       - cd C:\tmp\azcopy*;
-      - ./azcopy.exe copy "C:\tmp\\$nodeName.pcap" "$SAS"
-      - nslookup google.ro
+      - ./azcopy.exe copy "C:\tmp\\$nodeName.pcap" "$SAS";
+      - sleep 3600
   volumes:
   - name: logs
     hostPath:
@@ -63,22 +64,12 @@ spec:
       runAsUserName: NT AUTHORITY\SYSTEM
 status: {}
 EOF
+echo "You can extract the capture file with the following command at the end of the tests: kubectl cp default/windows-debug-17263:/tmp/$nodeName.pcap ./$nodeName.pcap"
 
 kubectl apply -f ./windumps.yaml
-echo "Download capture file"
-#kubectl cp default/windows-debug-17263:/tmp//$nodeName.pcap ./$nodeName.pcap
+
+#kubectl cp default/windows-debug-17263:/tmp/akswinx000000.pcap ./akswinx000000.pcap
 
 
-#if [[ "$1" == "version" ]]
-#then
-#    echo "1.0.2"
-#    exit 0
-#fi
-
-# optional argument handling
-#if [[ "$1" == "config" ]]
-#then
-#    echo "$KUBECONFIG"
-#    exit 0
 fi
 
